@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Book, Author, Category, Publisher
 
 class BookAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'publish_date')
+    list_display = ('title', 'author', 'published_date')
     search_fields = ('title',)
 
 admin.site.register(Book, BookAdmin)
