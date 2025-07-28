@@ -19,4 +19,7 @@ class Book(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     publisher = models.ForeignKey(Publisher, on_delete=models.SET_NULL, null=True)
-    publish_date = models.DateField()
+    subtitle = models.CharField(max_length=255, blank=True, null=True)
+    published_date = models.DateField(blank=True, null=True)
+    distribution_expense = models.FloatField(default=0.0)
+    # other fields...
