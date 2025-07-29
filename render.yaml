@@ -1,8 +1,0 @@
-services:
-  - type: web
-    name: bookwise-expense-tracker
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn myproject.wsgi:application
-    rootDir: myproject
-    autoDeploy: true
