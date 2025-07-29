@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+*.sqlite3
+env/
+.env
+
+# Django
+staticfiles/
+media/
+
+# Render.com
+.render/
