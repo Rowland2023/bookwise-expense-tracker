@@ -2,156 +2,185 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>📘 Book Expense Report</title>
+    <title>Expense Report</title>
 
-    <!-- 🔹 STEP 4.1: Include Chart.js and jsPDF Libraries -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <!-- 🔹 STEP 4.2: Add Basic Styling -->
+    {{ labels|json_script:"chart-labels" }}
+    {{ totals|json_script:"chart-totals" }}
+    {{ ticket_counts|json_script:"chart-tickets" }}
+
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 40px;
-            background: #f5f7fa;
+            margin: 2rem;
         }
-        h1 {
-            margin-bottom: 25px;
-            color: #222;
+        header, .actions, .table-container {
+            margin-bottom: 2rem;
         }
-        .chart-container {
-            max-width: 750px;
-            margin: 0 auto 30px auto; /* Center the chart container */
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        select, button {
+            margin-right: 1rem;
+            padding: 0.5rem;
+            font-size: 1rem;
         }
-        .buttons {
-            text-align: center; /* Center the buttons */
-            margin-top: 20px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
         }
-        button {
-            padding: 10px 20px;
-            margin: 0 5px; /* Adjust margin for centering */
-            background-color: #4285f4;
-            color: white;
-            border: none;
+        th, td {
+            border: 1px solid #ccc;
+            padding: 0.75rem;
+            text-align: center;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .no-data {
+            color: red;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+        .actions button {
             cursor: pointer;
-            border-radius: 4px;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #357ae8;
         }
     </style>
 </head>
 <body>
 
-    <!-- 🔹 STEP 4.3: Report Title -->
-    <h1>Book Expense Breakdown by Month</h1>
+    <!-- 🔹 Header & Filters -->
+    <header>
+        <h1>📊 Monthly Expense Report</h1>
+        <form method="GET" id="filterForm">
+            <label for="month">Month:</label>
+            <select name="month" id="month">
+                <option value="">All</option>
+                {% for m in months %}
+                    <option value="{{ m }}" {% if m == selected_month %}selected{% endif %}>{{ m }}</option>
+                {% endfor %}
+            </select>
 
-    <!-- 🔹 STEP 4.4: Load Expense Data from Django Context -->
-    <!-- IMPORTANT: The json_script filter itself generates the <script> tag.
-         Do NOT wrap it in another <script> tag. -->
-    {{ labels|json_script:"chart-labels" }}
-    {{ totals|json_script:"chart-totals" }}
+            <label for="category">Category:</label>
+            <select name="category" id="category">
+                <option value="">All</option>
+                {% for c in categories %}
+                    <option value="{{ c }}" {% if c == selected_category %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+            </select>
 
-    <!-- 🔹 STEP 4.5: Chart Container -->
-    <div class="chart-container">
-        <canvas id="expenseChart" width="700" height="400"></canvas>
+            <label for="year">Year:</label>
+            <select name="year" id="year">
+                <option value="">All</option>
+                {% for y in years %}
+                    <option value="{{ y }}" {% if y|stringformat:"s" == selected_year %}selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Apply Filters</button>
+        </form>
+    </header>
+
+    <!-- 🔹 Report Section -->
+    <div id="reportSection">
+        {% if no_data %}
+            <p class="no-data">
+                No expenses found{% if selected_month %} for {{ selected_month }}{% endif %}
+                {% if selected_category %} in category {{ selected_category }}{% endif %}
+                {% if selected_year %} for year {{ selected_year }}{% endif %}.
+            </p>
+        {% else %}
+            <!-- 🔹 Chart -->
+            <canvas id="expenseChart" width="600" height="300"></canvas>
+
+            <!-- 🔹 Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Total Expenses</th>
+                            <th>Ticket Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for label, total, tickets in report_data %}
+                            <tr>
+                                <td>{{ label }}</td>
+                                <td>${{ total }}</td>
+                                <td>{{ tickets }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 🔹 Export Buttons -->
+            <div class="actions">
+                <button id="downloadPdfBtn">Download PDF</button>
+                <a href="{% url 'export_report_csv' %}?month={{ selected_month }}&category={{ selected_category }}&year={{ selected_year }}">
+                    <button type="button">Download CSV</button>
+                </a>
+            </div>
+        {% endif %}
     </div>
 
-    <!-- 🔹 STEP 4.6: Action Buttons (Image + PDF Export) -->
-    <div class="buttons">
-        <button id="downloadChartBtn">Download Chart as Image</button>
-        <button id="exportPdfBtn">Export Chart as PDF</button>
-    </div>
-
-    <!-- 🔹 STEP 4.7: Chart Configuration + Export Logic -->
+    <!-- 🔹 Chart Script -->
     <script>
-        let expenseChart; // Declare expenseChart in a broader scope
+        const labels = JSON.parse(document.getElementById('chart-labels').textContent);
+        const totals = JSON.parse(document.getElementById('chart-totals').textContent);
+        const ticketCounts = JSON.parse(document.getElementById('chart-tickets').textContent);
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Parse labels and totals data from JSON
-            // These now correctly target the IDs generated by json_script
-            const labels = JSON.parse(document.getElementById('chart-labels').textContent);
-            const amounts = JSON.parse(document.getElementById('chart-totals').textContent);
-
-            // Chart configuration
-            const config = {
+        if (labels[0] !== "No data") {
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: 'Amount (₦)',
-                        data: amounts,
-                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }]
+                    datasets: [
+                        {
+                            label: 'Total Expenses',
+                            data: totals,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)'
+                        },
+                        {
+                            label: 'Ticket Count',
+                            data: ticketCounts,
+                            backgroundColor: 'rgba(255, 159, 64, 0.6)'
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Total Expenses by Month'
-                        },
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        }
-                    },
                     scales: {
                         y: {
                             beginAtZero: true
                         }
                     }
                 }
-            };
-
-            // Render the chart
-            const ctx = document.getElementById('expenseChart').getContext('2d');
-            expenseChart = new Chart(ctx, config); // Assign to the broader scoped variable
-
-            // Attach event listeners after chart is initialized
-            document.getElementById('downloadChartBtn').addEventListener('click', downloadChart);
-            document.getElementById('exportPdfBtn').addEventListener('click', exportPDF);
-        });
-
-        // 🔸 Export Chart as PNG
-        function downloadChart() {
-            if (expenseChart) { // Check if chart is initialized
-                const image = expenseChart.toBase64Image();
-                const link = document.createElement('a');
-                link.href = image;
-                link.download = 'book_expense_chart.png';
-                link.click();
-            } else {
-                console.error("Chart not initialized for download.");
-            }
-        }
-
-        // 🔸 Export Chart as PDF
-        function exportPDF() {
-            if (expenseChart) { // Check if chart is initialized
-                // Check if jspdf is loaded correctly
-                if (typeof jspdf === 'undefined' || !jspdf.jsPDF) {
-                    console.error("jsPDF library not loaded. Cannot export to PDF.");
-                    alert("PDF export not available. Please check console for errors.");
-                    return;
-                }
-                const canvas = document.getElementById('expenseChart');
-                const imgData = canvas.toDataURL('image/png');
-                const pdf = new jspdf.jsPDF();
-                pdf.addImage(imgData, 'PNG', 15, 30, 170, 90);
-                pdf.save('book_expense_report.pdf');
-            } else {
-                console.error("Chart not initialized for PDF export.");
-            }
+            });
         }
     </script>
+
+    <!-- ✅ Load html2pdf BEFORE attaching event listeners -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const pdfButton = document.getElementById('downloadPdfBtn');
+
+        if (typeof html2pdf === 'undefined') {
+            console.error("html2pdf is not loaded.");
+            return;
+        }
+
+        if (pdfButton) {
+            pdfButton.addEventListener('click', function () {
+                const element = document.getElementById('reportSection');
+                html2pdf().from(element).save('Expense_Report.pdf');
+            });
+        }
+    });
+</script>
+
 </body>
 </html>
