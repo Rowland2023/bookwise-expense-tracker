@@ -1,0 +1,45 @@
+<!-- books/templates/books/ticket_dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+        }
+        .ticket {
+            border: 1px solid #ccc;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .ticket-header {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .no-tickets {
+            color: #888;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎫 Ticket Dashboard</h1>
+
+    {% if tickets %}
+        {% for ticket in tickets %}
+            <div class="ticket">
+                <div class="ticket-header">Ticket #{{ forloop.counter }}</div>
+                <p><strong>Priority:</strong> {{ ticket.priority }}</p>
+                <p><strong>Status:</strong> {{ ticket.status|title }}</p>
+                <p><strong>Expense:</strong> {{ ticket.expense.name }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="no-tickets">No tickets available.</p>
+    {% endif %}
+</body>
+</html>

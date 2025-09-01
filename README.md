@@ -2,6 +2,14 @@
 
 A Django-based web application designed to track and visualize expenses related to book production, distribution, and other categories. It features data import from spreadsheets, a robust backend API, and an interactive expense report view using Chart.js.
 
+## 📸 Screenshots
+
+### Admin Dashboard
+![Admin Interface](statics/screenshot/admin_dashboard.png)
+
+### Expense Chart View
+![Expense Chart](statics/screenshot/expense_chart.png)
+
 ## ✨ Features
 
 * **Data Management:**
@@ -38,3 +46,4 @@ Follow these steps to get the project up and running on your local machine.
 ```bash
 git clone [https://github.com/Rowland2023/bookwise-expense-tracker.git](https://github.com/Rowland2023/bookwise-expense-tracker.git)
 cd bookwise-expense-tracker/myproject # Navigate into your Django project root
+

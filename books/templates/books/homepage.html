@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Bookwise Expense Tracker</title>
+</head>
+<body>
+    <h1>📚 Bookwise Expense Tracker</h1>
+    <p>Welcome, Rowland! Choose where to go:</p>
+    <ul>
+        <li><a href="{% url 'report' %}">View Expense Report</a></li>
+        <li><a href="{% url 'ticket_dashboard' %}?sort=asc">Ticket Dashboard</a></li>
+        <li><a href="/admin/">Admin Panel</a></li>
+    </ul>
+</body>
+</html>
