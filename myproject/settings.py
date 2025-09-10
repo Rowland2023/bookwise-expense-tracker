@@ -27,7 +27,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['https://bookwise-expense-tracker-15.onrender.com']
+ALLOWED_HOSTS = ['bookwise-expense-tracker-15.onrender.com', 'localhost', '127.0.0.1']
+
 
 
 
