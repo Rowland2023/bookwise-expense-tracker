@@ -1,10 +1,22 @@
 version: '3.8'
+
 services:
-  web:
-    build: .
-    ports:
-      - "8000:8000"
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    env_file:
+      - .env
     volumes:
       - .:/app
-    environment:
-      - DEBUG=True
+    develop:
+      watch:
+        - path: ./app
+          action: sync
+          target: /app
+        - path: ./requirements.txt
+          action: rebuild
+    labels:
+      traefik.http.routers.backend.rule: Host(`localhost`) && PathPrefix(`/api`)
+      traefik.http.services.backend.loadbalancer.server.port: 8000
