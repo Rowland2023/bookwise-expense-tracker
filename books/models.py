@@ -55,11 +55,20 @@ class Book(models.Model):
 
 # 💸 Expense Model
 class Expense(models.Model):
+    CATEGORY_CHOICES = [
+        ('Food', 'Food'),
+        ('Transport', 'Transport'),
+        ('Utilities', 'Utilities'),
+        ('Entertainment', 'Entertainment'),
+        ('Other', 'Other'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    date = models.DateField()
-    category = models.CharField(max_length=50)
-    book = models.ForeignKey(Book, on_delete=models.SET_NULL, null=True, blank=True, related_name='expenses')
+    date = models.DateField(default=timezone.now)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    book = models.ForeignKey('Book', on_delete=models.SET_NULL, null=True, blank=True, related_name='expenses')
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -68,31 +77,28 @@ class Expense(models.Model):
         ordering = ['-date']
 
     def __str__(self):
-        return f"{self.name} - ₦{self.amount}"
-
+        return f"{self.name} ({self.category}) - ₦{self.amount} by {self.user.username}"
 
 # 🎟️ Ticket Model
 class Ticket(models.Model):
-    STATUS_PENDING = 'pending'
-    STATUS_APPROVED = 'approved'
-    STATUS_COMPLETED = 'completed'
-
     STATUS_CHOICES = [
-        (STATUS_PENDING, 'Pending'),
-        (STATUS_APPROVED, 'Approved'),
-        (STATUS_COMPLETED, 'Completed'),
+        ('open', 'Open'),
+        ('in_progress', 'In Progress'),
+        ('resolved', 'Resolved'),
     ]
 
-    expense = models.ForeignKey(Expense, on_delete=models.CASCADE, related_name='tickets')
-    priority = models.PositiveSmallIntegerField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING)
-    submitted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='submitted_tickets')
-    notes = models.TextField(blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    subject = models.CharField(max_length=200, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    #expense = models.ForeignKey(Expense, on_delete=models.CASCADE)
+
 
     class Meta:
         verbose_name_plural = "Tickets"
-        ordering = ['-priority', 'timestamp']
+        ordering = ['-created_at']
 
     def __str__(self):
-        return f"Ticket #{self.id} for {self.expense.name} ({self.status})"
+        return f"{self.subject} ({self.status}) by {self.user.username}"
