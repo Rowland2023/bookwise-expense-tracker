@@ -19,5 +19,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Development stage
 FROM base AS dev
 
+# Install dev utilities (like ping)
+RUN apt-get update && apt-get install -y iputils-ping
+
+# Copy project files
 COPY . .
+
+# Run Django dev server
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

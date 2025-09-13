@@ -16,8 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from books.views import register  # Replace 'yourapp' with your actual app name
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('books.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),  # login, logout, password reset
+    path('accounts/register/', register, name='register'),   # custom signup
+    path('', include('books.urls')),  # Include your app's URLs
 ]
+
