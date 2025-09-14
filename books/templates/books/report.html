@@ -117,8 +117,13 @@
             <!-- 🔹 Export Buttons -->
             <div class="actions">
                 <button id="downloadPdfBtn">Download PDF</button>
+
                 <a href="{% url 'export_report_csv' %}?month={{ selected_month }}&category={{ selected_category }}&year={{ selected_year }}">
                     <button type="button">Download CSV</button>
+                </a>
+
+                <a href="{% url 'export-report-xlsx' %}?month={{ selected_month }}&category={{ selected_category }}&year={{ selected_year }}">
+                    <button type="button">Download XLSX</button>
                 </a>
             </div>
         {% endif %}
@@ -162,25 +167,25 @@
     </script>
 
     <!-- ✅ Load html2pdf BEFORE attaching event listeners -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const pdfButton = document.getElementById('downloadPdfBtn');
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const pdfButton = document.getElementById('downloadPdfBtn');
 
-        if (typeof html2pdf === 'undefined') {
-            console.error("html2pdf is not loaded.");
-            return;
-        }
+            if (typeof html2pdf === 'undefined') {
+                console.error("html2pdf is not loaded.");
+                return;
+            }
 
-        if (pdfButton) {
-            pdfButton.addEventListener('click', function () {
-                const element = document.getElementById('reportSection');
-                html2pdf().from(element).save('Expense_Report.pdf');
-            });
-        }
-    });
-</script>
+            if (pdfButton) {
+                pdfButton.addEventListener('click', function () {
+                    const element = document.getElementById('reportSection');
+                    html2pdf().from(element).save('Expense_Report.pdf');
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>

@@ -2,6 +2,8 @@ from django.urls import path
 from books.views import dashboard_view
 from django.contrib.auth import views as auth_views
 from books.views import ticket_dashboard_view
+from .views import export_report_xlsx
+
 from books.views import (
     homepage_view,
     report_view,
@@ -16,6 +18,7 @@ urlpatterns = [
     path('dashboard/', dashboard_view, name='dashboard'),
     path('accounts/login/', auth_views.LoginView.as_view(redirect_authenticated_user=True), name='login'),
     path('reports/', report_view, name='report'),
+    path('reports/export/xlsx/', export_report_xlsx, name='export-report-xlsx'),
     path('reports/export/', export_report_csv, name='export_report_csv'),
     path('tickets/', ticket_dashboard_view, name='ticket-dashboard'),
     path('sort-tickets/', ticket_sort_view, name='sort-tickets'),

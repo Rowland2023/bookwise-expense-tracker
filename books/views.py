@@ -4,9 +4,7 @@ from django.http import HttpResponse
 from django.db.models import Sum, Count
 from django.db.models.functions import ExtractMonth, ExtractYear
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import login, logout
-from django.core.mail import send_mail
-from django.contrib.auth.models import User
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -19,6 +17,7 @@ from .models import Expense, Ticket, Book, Category, ExpenseType
 from .serializers import TicketSerializer
 from django.contrib import messages
 import csv
+import openpyxl
 
 # --------------------------------------------------
 # 🔧 Utility Functions
@@ -60,18 +59,16 @@ def _get_monthly_expenses(qs):
     ).values('month', 'year').annotate(total=Sum('amount')).order_by('year', 'month')
 
 def _get_monthly_ticket_counts():
-    ticket_data = Ticket.objects.annotate(
+    return Ticket.objects.annotate(
         month=ExtractMonth('created_at'),
         year=ExtractYear('created_at')
     ).values('month', 'year').annotate(count=Count('id'))
 
-    return {
+def _build_chart_data(expenses, ticket_data):
+    ticket_map = {
         (entry['month'], entry['year']): entry['count']
         for entry in ticket_data
-        if entry['month'] and entry['year']
     }
-
-def _build_chart_data(expenses, ticket_map):
     labels, totals, ticket_counts = [], [], []
     for entry in expenses:
         month, year, total = entry['month'], entry['year'], entry['total']
@@ -89,7 +86,9 @@ def _get_dropdown_options():
     ))
 
     categories = sorted(set(
-        c.name for c in Category.objects.all()
+        Expense.objects.select_related('book__category')
+        .values_list('book__category__name', flat=True)
+        .distinct()
     ))
 
     years = sorted(set(
@@ -106,8 +105,8 @@ def _get_dropdown_options():
 def report_view(request):
     expenses_qs, selected_month, selected_category, selected_year = _filter_expenses(request)
     expenses = _get_monthly_expenses(expenses_qs)
-    ticket_map = _get_monthly_ticket_counts()
-    labels, totals, ticket_counts = _build_chart_data(expenses, ticket_map)
+    ticket_data = _get_monthly_ticket_counts()
+    labels, totals, ticket_counts = _build_chart_data(expenses, ticket_data)
 
     report_data = list(zip(labels, totals, ticket_counts))
     no_data = not report_data
@@ -118,7 +117,6 @@ def report_view(request):
 
     months, categories, years = _get_dropdown_options()
 
-    # ✅ Group expenses by book category
     category_totals = (
         Expense.objects.select_related('book__category')
         .values('book__category__name')
@@ -144,7 +142,11 @@ def report_view(request):
 def export_report_csv(request):
     expenses_qs, selected_month, selected_category, selected_year = _filter_expenses(request)
     expenses = _get_monthly_expenses(expenses_qs)
-    ticket_map = _get_monthly_ticket_counts()
+    ticket_data = _get_monthly_ticket_counts()
+    ticket_map = {
+        (entry['month'], entry['year']): entry['count']
+        for entry in ticket_data
+    }
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="expense_report.csv"'
@@ -157,6 +159,31 @@ def export_report_csv(request):
         ticket_count = ticket_map.get((month, year), 0)
         writer.writerow([label, float(total), ticket_count])
 
+    return response
+
+def export_report_xlsx(request):
+    expenses_qs, selected_month, selected_category, selected_year = _filter_expenses(request)
+    expenses = _get_monthly_expenses(expenses_qs)
+    ticket_data = _get_monthly_ticket_counts()
+    ticket_map = {
+        (entry['month'], entry['year']): entry['count']
+        for entry in ticket_data
+    }
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Expense Report"
+    ws.append(['Month', 'Total Expenses', 'Ticket Count'])
+
+    for entry in expenses:
+        month, year, total = entry['month'], entry['year'], entry['total']
+        label = f"{month_name[month][:3]} {year}"
+        ticket_count = ticket_map.get((month, year), 0)
+        ws.append([label, float(total), ticket_count])
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="expense_report.xlsx"'
+    wb.save(response)
     return response
 
 # --------------------------------------------------
@@ -219,9 +246,6 @@ def register(request):
         form = UserCreationForm()
 
     return render(request, 'registration/register.html', {'form': form})
-from django.contrib.auth.decorators import login_required
-from .forms import ExpenseForm
-from .models import Expense
 
 @login_required
 def dashboard_view(request):
@@ -234,6 +258,8 @@ def dashboard_view(request):
             expense.save()
             messages.success(request, "✅ Expense added successfully!")
             return redirect('dashboard')
+        else:
+            messages.error(request, "⚠️ Please correct the errors below.")
 
     expenses = list(Expense.objects.select_related('book__category', 'expense_type')
                     .filter(user=request.user).order_by('-date')[:10])
