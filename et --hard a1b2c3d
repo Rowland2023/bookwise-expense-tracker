@@ -1,0 +1,46 @@
+[33m1c671aa[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #22 from Rowland2023/kk-branch
+[33m4dc6fd7[m[33m ([m[1;31morigin/nice-branch-feature2[m[33m, [m[1;32mnice-branch-feature2[m[33m)[m Add python-dotenv to requirements
+[33m57d0bb2[m Merge pull request #21 from Rowland2023/nice-branch-feature2
+[33m9254dc8[m Added welcome page ,registration page
+[33mdab8c0f[m Merge pull request #20 from Rowland2023/nice-branch-feature2
+[33med7ea9b[m Prepare for Render deployment
+[33m59cbf22[m Merge pull request #18 from Rowland2023/feature2
+[33m08c65e1[m[33m ([m[1;31morigin/feature2[m[33m, [m[1;31morigin/branch-1[m[33m, [m[1;32mfeature2[m[33m, [m[1;32mbranch-1[m[33m)[m Modify settings.py
+[33md3fc6a9[m Merge pull request #16 from Rowland2023/branch-1
+[33m93a5eaa[m settings.py
+[33m19ffac2[m Merge pull request #15 from Rowland2023/branch-1
+[33m2290e71[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m .env and settings
+[33mb45bd90[m Merge pull request #14 from Rowland2023/main
+[33m234e4a6[m Move .gitignore to repo root
+[33m727c011[m Update Procfile
+[33m6ca2dd7[m Fix Procfile path for Render deployment
+[33m39b611c[m Merge pull request #13 from Rowland2023/main
+[33m967f8c4[m Ready for Render deployment
+[33m6f1bdef[m Merge pull request #12 from Rowland2023/featured-branch
+[33m3519892[m[33m ([m[1;31morigin/featured-branch[m[33m)[m Restructure project for Render deployment
+[33m8a0bfce[m Merge pull request #11 from Rowland2023/featured-branch
+[33md78a0de[m admin loging modified
+[33m224d65b[m Merge pull request #10 from Rowland2023/featured-branch
+[33md560ec2[m deleted duplicate myproject folder
+[33m1655e38[m Create requirements.txt
+[33m3aab3c4[m Remove Dockerfile to use native Python build on Render
+[33m834e9d7[m Merge pull request #9 from Rowland2023/featured-branch
+[33m2718e72[m[33m ([m[1;31morigin/branch1[m[33m, [m[1;32mcheckout[m[33m, [m[1;32mbranch1[m[33m)[m Updated screenshort
+[33mb30aed0[m Merge pull request #8 from Rowland2023/branch1
+[33m6789ee9[m screenshort added
+[33mb2a1d3d[m Merge pull request #7 from Rowland2023/very-last-branch
+[33mba4dc29[m[33m ([m[1;31morigin/very-last-branch[m[33m, [m[1;32mvery-last-branch[m[33m)[m file creation and modification
+[33m6603eed[m Merge pull request #6 from Rowland2023/last-branch
+[33m4ccd4df[m[33m ([m[1;31morigin/last-branch[m[33m, [m[1;32mlast-branch[m[33m)[m Fix Procfile with PYTHONPATH for nested project
+[33m67744d9[m Merge pull request #5 from Rowland2023/new-branch
+[33m969fff1[m render.yaml file
+[33med18368[m Merge pull request #4 from Rowland2023/new-branch
+[33m29a98c1[m Prepare project for Render deployment
+[33m8167cca[m Create README.md
+[33ma392a9e[m Merge pull request #3 from Rowland2023/next-branch
+[33m6730543[m[33m ([m[1;31morigin/next-branch[m[33m, [m[1;32mnext-branch[m[33m)[m Finall commit
+[33m39ae9f0[m Merge pull request #2 from Rowland2023/feature-branch
+[33m1457fb2[m[33m ([m[1;31morigin/feature-branch[m[33m)[m command file updated to import_book with file update as well
+[33m734d82c[m Merge pull request #1 from Rowland2023/new-branch
+[33meb28fbe[m Parseing csv file inside django
+[33m86293ba[m initialcommit

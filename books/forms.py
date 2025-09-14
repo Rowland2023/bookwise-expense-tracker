@@ -11,4 +11,9 @@ class TicketForm(forms.ModelForm):
 class ExpenseForm(forms.ModelForm):
     class Meta:
         model = Expense
-        fields = ['name', 'amount', 'category', 'book']
+        fields = ['book', 'expense_type', 'amount']
+        widgets = {
+            'book': forms.Select(attrs={'class': 'form-control'}),
+            'expense_type': forms.Select(attrs={'class': 'form-control'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter amount'}),
+        }

@@ -25,6 +25,14 @@
             font-size: 2.2em;
             margin-bottom: 10px;
         }
+        .error-message {
+            background-color: rgba(255, 0, 0, 0.2);
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
         form {
             display: flex;
             flex-direction: column;
@@ -73,11 +81,20 @@
 <body>
     <div class="container">
         <h1>Log in to Bookwise 📚</h1>
+
+        {% if form.errors %}
+            <div class="error-message">
+                Please enter a correct username and password. Note that both fields may be case-sensitive.
+            </div>
+        {% endif %}
+
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
+            <input type="hidden" name="next" value="{{ next }}">
             <input type="submit" value="Log In">
         </form>
+
         <div class="reset-link">
             <p><a href="{% url 'password_reset' %}">Forgot your password?</a></p>
         </div>
