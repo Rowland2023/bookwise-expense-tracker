@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import dj_database_url
+from decouple import config
 
 # 📦 Load environment variables
 load_dotenv()
@@ -10,8 +11,8 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # 🔐 Security
-SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-for-local-development')
-DEBUG = os.getenv('DEBUG', 'True') == 'True'  # Force debug ON for local testing
+SECRET_KEY = config('SECRET_KEY')
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = [
     'bookwise-expense-tracker-15.onrender.com',
@@ -70,12 +71,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
 # 🗄️ Database
-from decouple import config
-import dj_database_url
-
-SECRET_KEY = config('SECRET_KEY')
-DEBUG = config('DEBUG', default=False, cast=bool)
-
 DATABASES = {
     'default': dj_database_url.config(
         default=f"postgres://{config('DATABASE_USER')}:{config('DATABASE_PASSWORD')}@{config('DATABASE_HOST')}:{config('DATABASE_PORT')}/{config('DATABASE_NAME')}",
@@ -83,7 +78,6 @@ DATABASES = {
         ssl_require=True
     )
 }
-
 
 
 # 📧 Email Configuration
@@ -110,13 +104,11 @@ USE_I18N = True
 USE_TZ = True
 
 # 📂 Static files
-from pathlib import Path
-BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_URL = 'static/'
-#STATIC_ROOT = BASE_DIR / 'staticfiles'
-#STATICFILES_DIRS = [
-#    BASE_DIR / "books" / "static",  # if static is inside your app
-#]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # 🧪 Default primary key field
@@ -127,37 +119,17 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = 'home'
 
 # 🪵 Logging for error tracking
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'error.log',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    },
-}
-
-
+# Consolidated and improved logging configuration
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'level': 'DEBUG',  # Show all logs
         },
     },
     'root': {
         'handlers': ['console'],
-        'level': 'DEBUG',
+        'level': 'INFO', # Set a reasonable default level
     },
 }
