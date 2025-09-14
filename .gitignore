@@ -11,3 +11,27 @@ media/
 
 # Render.com
 .render/
+# VSCode
+.vscode/
+
+# macOS
+.DS_Store
+# Node.js (if using npm or frontend tools)
+node_modules/
+*.lock
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage.xml
+
+# Test artifacts
+*.pytest_cache/
+*.tox/
+
+# Logs
+*.log
+
+# Migrations (if you want to exclude them during early dev)
+*/migrations/*.py
+!*/migrations/__init__.py
