@@ -3,6 +3,34 @@ services:
     name: bookwise-expense-tracker
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn myproject.wsgi:application
-    rootDir: myproject
+    startCommand: gunicorn myproject.wsgi
     autoDeploy: true
+    envVars:
+      - key: DEBUG
+        value: false
+      - key: SECRET_KEY
+        fromEnv: SECRET_KEY
+      - key: DATABASE_NAME
+        value: book_expense_db
+      - key: DATABASE_USER
+        value: book_expense_db_user
+      - key: DATABASE_PASSWORD
+        value: wGIvK39Vv2ocOJ8ssyta54ycrMjKV28o
+      - key: DATABASE_HOST
+        value: dpg-d30dv1vfte5s73ea3p6g-a.oregon-postgres.render.com
+      - key: DATABASE_PORT
+        value: 5432
+      - key: EMAIL_BACKEND
+        value: django.core.mail.backends.smtp.EmailBackend
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_USE_TLS
+        value: true
+      - key: EMAIL_HOST_USER
+        value: your_email@gmail.com
+      - key: EMAIL_HOST_PASSWORD
+        value: your_app_password
+      - key: DEFAULT_FROM_EMAIL
+        value: noreply@bookwise.com
