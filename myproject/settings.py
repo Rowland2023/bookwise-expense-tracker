@@ -70,21 +70,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
 # 🗄️ Database
+from decouple import config
 import dj_database_url
 
+SECRET_KEY = config('SECRET_KEY')
+DEBUG = config('DEBUG', default=False, cast=bool)
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'book_expense_db',
-        'USER': 'book_expense_db_user',
-        'PASSWORD': 'wGIvK39Vv2ocOJ8ssyta54ycrMjKV28o',
-        'HOST': 'dpg-d30dv1vfte5s73ea3p6g-a.oregon-postgres.render.com',
-        'PORT': '5432',
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
-    }
+    'default': dj_database_url.config(
+        default=f"postgres://{config('DATABASE_USER')}:{config('DATABASE_PASSWORD')}@{config('DATABASE_HOST')}:{config('DATABASE_PORT')}/{config('DATABASE_NAME')}",
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
+
 
 
 # 📧 Email Configuration
