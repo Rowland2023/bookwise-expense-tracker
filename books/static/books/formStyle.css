@@ -1,0 +1,40 @@
+.container {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.auth-options {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    margin-top: 30px;
+}
+
+.auth-box {
+    border: 1px solid #ccc;
+    padding: 30px;
+    border-radius: 10px;
+    width: 300px;
+    background-color: #f9f9f9;
+}
+
+.auth-box h2 {
+    margin-bottom: 10px;
+}
+
+.auth-box p {
+    margin-bottom: 20px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #0077cc;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.btn:hover {
+    background-color: #005fa3;
+}

@@ -14,7 +14,7 @@ from books.views import (
 urlpatterns = [
     path('', homepage_view, name='home'),
     path('dashboard/', dashboard_view, name='dashboard'),
-    path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
+    path('accounts/login/', auth_views.LoginView.as_view(redirect_authenticated_user=True), name='login'),
     path('reports/', report_view, name='report'),
     path('reports/export/', export_report_csv, name='export_report_csv'),
     path('tickets/', ticket_dashboard_view, name='ticket-dashboard'),

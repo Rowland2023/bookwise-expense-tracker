@@ -99,14 +99,27 @@
 
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
+            <label for="amount">Amount:</label>
+            {{ form.amount }}
+
+            <label for="expense_type">Expense Type:</label>
+            {{ form.expense_type }}
+
+            <label for="book">Book:</label>
+            {{ form.book }}
+
             <button type="submit">Add Expense</button>
         </form>
 
         <h3>Recent Expenses</h3>
         <ul>
             {% for expense in expenses %}
-                <li>{{ expense.date }} – {{ expense.category }}: ₦{{ expense.amount }}</li>
+                <li>
+                    {{ expense.date }} – 
+                    {{ expense.book.category.name }} / 
+                    {{ expense.book.title }} – 
+                    {{ expense.expense_type.name }}: ₦{{ expense.amount }}
+                </li>
             {% empty %}
                 <li>No expenses yet.</li>
             {% endfor %}

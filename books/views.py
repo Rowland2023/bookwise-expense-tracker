@@ -15,10 +15,9 @@ from calendar import month_name
 from datetime import datetime
 from django.utils import timezone
 from .forms import TicketForm, ExpenseForm
-from .models import Expense, Ticket
+from .models import Expense, Ticket, Book, Category, ExpenseType
 from .serializers import TicketSerializer
 from django.contrib import messages
-
 import csv
 
 # --------------------------------------------------
@@ -37,7 +36,7 @@ def _filter_expenses(request):
     selected_category = request.GET.get('category', '').strip().title()
     selected_year = request.GET.get('year', '').strip()
 
-    qs = Expense.objects.all()
+    qs = Expense.objects.select_related('book__category')
 
     try:
         if selected_month:
@@ -47,7 +46,7 @@ def _filter_expenses(request):
         selected_month = ''
 
     if selected_category:
-        qs = qs.filter(category__iexact=selected_category)
+        qs = qs.filter(book__category__name__iexact=selected_category)
 
     if selected_year.isdigit():
         qs = qs.filter(date__year=int(selected_year))
@@ -90,7 +89,7 @@ def _get_dropdown_options():
     ))
 
     categories = sorted(set(
-        c.strip().title() for c in Expense.objects.values_list('category', flat=True).distinct() if c
+        c.name for c in Category.objects.all()
     ))
 
     years = sorted(set(
@@ -119,6 +118,14 @@ def report_view(request):
 
     months, categories, years = _get_dropdown_options()
 
+    # ✅ Group expenses by book category
+    category_totals = (
+        Expense.objects.select_related('book__category')
+        .values('book__category__name')
+        .annotate(total=Sum('amount'))
+        .order_by('-total')
+    )
+
     return render(request, 'books/report.html', {
         'labels': labels,
         'totals': totals,
@@ -131,6 +138,7 @@ def report_view(request):
         'selected_category': selected_category,
         'selected_year': selected_year,
         'no_data': no_data,
+        'category_totals': category_totals,
     })
 
 def export_report_csv(request):
@@ -211,16 +219,12 @@ def register(request):
         form = UserCreationForm()
 
     return render(request, 'registration/register.html', {'form': form})
+from django.contrib.auth.decorators import login_required
+from .forms import ExpenseForm
+from .models import Expense
 
 @login_required
 def dashboard_view(request):
-    hour = datetime.now().hour
-    greeting = (
-        "Good morning" if hour < 12 else
-        "Good afternoon" if hour < 18 else
-        "Good evening"
-    )
-
     form = ExpenseForm()
     if request.method == 'POST':
         form = ExpenseForm(request.POST)
@@ -228,24 +232,17 @@ def dashboard_view(request):
             expense = form.save(commit=False)
             expense.user = request.user
             expense.save()
-
-            # 🔧 Create a ticket automatically
-            Ticket.objects.create(
-                user=request.user,
-                subject=f"Expense: {expense.name}",
-                description=f"Amount: {expense.amount}, Category: {expense.category}",
-                status="open",
-                created_at=timezone.now()
-            )
-
-            messages.success(request, "✅ Expense and ticket added successfully!")
+            messages.success(request, "✅ Expense added successfully!")
             return redirect('dashboard')
 
-    expenses = Expense.objects.filter(user=request.user).order_by('-date')[:5]
+    expenses = list(Expense.objects.select_related('book__category', 'expense_type')
+                    .filter(user=request.user).order_by('-date')[:10])
+
+    greeting = "Good evening" if timezone.now().hour >= 18 else "Hello"
 
     return render(request, 'books/dashboard.html', {
-        'greeting': greeting,
         'form': form,
         'expenses': expenses,
+        'greeting': greeting,
         'user': request.user,
     })
