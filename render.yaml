@@ -1,8 +1,29 @@
-services:
-  - type: web
-    name: bookwise-expense-tracker
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn myproject.wsgi:application
-    rootDir: myproject
-    autoDeploy: true
+envVars:
+  - key: DEBUG
+    fromEnv: DEBUG
+  - key: SECRET_KEY
+    fromEnv: SECRET_KEY
+  - key: DATABASE_NAME
+    fromEnv: DATABASE_NAME
+  - key: DATABASE_USER
+    fromEnv: DATABASE_USER
+  - key: DATABASE_PASSWORD
+    fromEnv: DATABASE_PASSWORD
+  - key: DATABASE_HOST
+    fromEnv: DATABASE_HOST
+  - key: DATABASE_PORT
+    fromEnv: DATABASE_PORT
+  - key: EMAIL_BACKEND
+    fromEnv: EMAIL_BACKEND
+  - key: EMAIL_HOST
+    fromEnv: EMAIL_HOST
+  - key: EMAIL_PORT
+    fromEnv: EMAIL_PORT
+  - key: EMAIL_USE_TLS
+    fromEnv: EMAIL_USE_TLS
+  - key: EMAIL_HOST_USER
+    fromEnv: EMAIL_HOST_USER
+  - key: EMAIL_HOST_PASSWORD
+    fromEnv: EMAIL_HOST_PASSWORD
+  - key: DEFAULT_FROM_EMAIL
+    fromEnv: DEFAULT_FROM_EMAIL
