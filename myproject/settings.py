@@ -70,19 +70,22 @@ TEMPLATES = [
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
 # 🗄️ Database
+import dj_database_url
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bookwise_expense_db',
-        'USER': 'postgres',
-        'PASSWORD': 'God4me@2025',
-        'HOST': 'localhost',
+        'NAME': 'book_expense_db',
+        'USER': 'book_expense_db_user',
+        'PASSWORD': 'wGIvK39Vv2ocOJ8ssyta54ycrMjKV28o',
+        'HOST': 'dpg-d30dv1vfte5s73ea3p6g-a.oregon-postgres.render.com',
         'PORT': '5432',
         'OPTIONS': {
-            'sslmode': 'disable'
-        }
+            'sslmode': 'require',
+        },
     }
 }
+
 
 # 📧 Email Configuration
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
@@ -112,9 +115,9 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_URL = 'static/'
 #STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / "staticfiles",
-]
+#STATICFILES_DIRS = [
+#    BASE_DIR / "books" / "static",  # if static is inside your app
+#]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # 🧪 Default primary key field
