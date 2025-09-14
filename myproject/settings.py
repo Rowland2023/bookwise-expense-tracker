@@ -70,21 +70,24 @@ TEMPLATES = [
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
 # 🗄️ Database
+
 import dj_database_url
+import environ
+env = environ.Env()
+environ.Env.read_env()
+
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'book_expense_db',
-        'USER': 'book_expense_db_user',
-        'PASSWORD': 'wGIvK39Vv2ocOJ8ssyta54ycrMjKV28o',
-        'HOST': 'dpg-d30dv1vfte5s73ea3p6g-a.oregon-postgres.render.com',
-        'PORT': '5432',
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
+        'NAME': env('DATABASE_NAME'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASSWORD'),
+        'HOST': env('DATABASE_HOST'),
+        'PORT': env('DATABASE_PORT'),
     }
 }
+
 
 
 # 📧 Email Configuration
