@@ -15,7 +15,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = [
-    'bookwise-expense-tracker-15.onrender.com',
+    'bookwise-expense-tracker-16.onrender.com',
     'localhost',
     '127.0.0.1'
 ]
